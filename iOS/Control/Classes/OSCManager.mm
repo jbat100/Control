@@ -208,7 +208,19 @@ protected:
 		NSArray *strValues = [allvalues componentsSeparatedByString:@","];
 		for(int j = 0; j < [strValues count]; j++) {
 			NSString * value = [strValues objectAtIndex:j];
-			p << [value floatValue];
+            
+            // if we can't get number then send as string
+            NSNumberFormatter *nf = [[NSNumberFormatter alloc] init];
+            BOOL isNumber = [nf numberFromString:value] != nil;
+            
+            if (isNumber)
+            {
+                p << [value floatValue];
+            }
+            else
+            {
+                p << [value cStringUsingEncoding:NSUTF8StringEncoding];
+            }
 		}
 		p << osc::EndMessage;
 	}
