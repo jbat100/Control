@@ -287,10 +287,14 @@ Button.prototype.event = function(event) {
 
 Button.prototype.output = function() {
     if (!this.isLocal && _protocol == "OSC") {
-        // var valueString = "|" + this.address;
-        //   valueString += ":" + this.value;
-        //   control.valuesString += valueString;
-        window.oscManager.sendOSC([this.address, 'f', this.value]);            
+		var args = [this.address];
+		if (controlIdentifier) {
+			args = args.concat(['sf', controlIdentifier, this.value]);
+		}
+		else {
+			args = args.concat(['f', this.value]);
+		}
+        window.oscManager.sendOSC(args);            
     } else if (!this.isLocal && _protocol == "MIDI") {
         PhoneGap.exec(null, null, 'MIDIManager', 'send', ["cc", 0, 10, 127]);
     }

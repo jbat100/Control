@@ -39,6 +39,8 @@ public class OSCManager extends Plugin {
 	public OSCListener listener;
 	public String ipAddress;
 	
+	public String controlIdentifier = "__DEFAULT__";
+	
 	public Class dd;
 	
 	@Override
@@ -95,13 +97,14 @@ public class OSCManager extends Plugin {
     			Log.d("OSCManager", "building message");
     			String address = "";
     			ArrayList<Object> values = new ArrayList<Object>();
+    			//values.add(controlIdentifier);
     			address = data.getString(0);
-				for(int i = 2; i < data.length(); i++) {
+				for (int i = 2; i < data.length(); i++) {
 				    Object obj = data.get(i);
-				    if(obj instanceof java.lang.Double) { // doubles are returned from JSON instead of floatsbut not handled by the oscmsg class
+				    if (obj instanceof java.lang.Double) { // doubles are returned from JSON instead of floats, but not handled by the oscmsg class
 				        //System.out.println("got a double");
 				        values.add( new Float( ( (Double) obj ).doubleValue() ) );
-				    }else{
+				    } else {
     					values.add( obj);
     				}
 					//Log.d("OSCManager", ""+data.get(i).getClass().toString());
