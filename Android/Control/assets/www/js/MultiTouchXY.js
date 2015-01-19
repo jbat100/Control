@@ -294,5 +294,8 @@ MultiTouchXY.prototype.unload = function() {
 
 	
 MultiTouchXY.prototype.output = function(touch) {
-    PhoneGap.exec(null, null, 'OSCManager', 'send', [this.address + "/" + touch.activeNumber, 'ff', this.xvalue, this.yvalue] );
+	var args = [this.address + "/" + touch.activeNumber];
+	if (controlIdentifier) { args = args.concat( ['sff', controlIdentifier, this.xvalue, this.yvalue] ); } 
+	else { args = args.concat( ['ff', this.xvalue, this.yvalue] ); } 
+    PhoneGap.exec(null, null, 'OSCManager', 'send', args);
 }

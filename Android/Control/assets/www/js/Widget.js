@@ -136,19 +136,6 @@ Widget.prototype.setValueNoOutput = function(newValue) {
     eval(this.onvaluechange);
 }
 
-Widget.prototype.output = function() {
-    if(!this.isLocal && _protocol == "OSC") {
-        var valueString = "|" + this.address;
-        valueString += ":" + this.value;
-        control.valuesString += valueString;
-        //PhoneGap.exec('OSCManager.send', this.address, 'f', this.value);
-    }else if (!this.isLocal && _protocol == "MIDI") {
-        var valueString = "|" + this.midiType + "," + (this.channel - 1) + "," + this.midiNumber+ "," + Math.round(this.value);
-        control.valuesString += valueString;
-    }
-    
-}
-
 Widget.prototype.event = function(event) {
   if(event.type != "touchend") {
     touch = event.changedTouches.item(0);
@@ -160,14 +147,14 @@ Widget.prototype.event = function(event) {
 
 Widget.prototype.output = function() {
     if(!this.isLocal && _protocol == "OSC") {
-        // var valueString = "|" + this.address;
-        //         valueString += ":" + this.value;
-        //         control.valuesString += valueString;
-        
-        //console.log(this.address + " || " + this.value);
-        oscManager.sendOSC([this.address, 'f', this.value]);
-
-        //PhoneGap.exec('OSCManager.send', this.address, 'f', this.value);
+		var args = [this.address];
+		if (controlIdentifier) {
+			args = args.concat(['sf', controlIdentifier, this.value]);
+		}
+		else {
+			args = args.concat(['sf', 'WTF', this.value]);
+		}        
+        window.oscManager.sendOSC(args);  
     }else if (!this.isLocal && _protocol == "MIDI") {
         var valueString = "|" + this.midiType + "," + (this.channel - 1) + "," + this.midiNumber+ "," + Math.round(this.value);
         control.valuesString += valueString;
