@@ -1,3 +1,9 @@
 *.swp
 *.swo
 *~
+iOS/Control/Control.xcodeproj/project.xcworkspace/contents.xcworkspacedata
+iOS/Control/Control.xcodeproj/project.xcworkspace/xcshareddata/Control.xccheckout
+iOS/Control/Control.xcodeproj/project.xcworkspace/xcuserdata/jonathanthorpe.xcuserdatad/UserInterfaceState.xcuserstate
+iOS/Control/Control.xcodeproj/xcuserdata/jonathanthorpe.xcuserdatad/xcschemes/Control.xcscheme
+iOS/Control/Control.xcodeproj/xcuserdata/jonathanthorpe.xcuserdatad/xcschemes/xcschememanagement.plist
+Android/Control/.idea
