@@ -27,9 +27,12 @@ import java.io.StringWriter;
 import java.io.PrintWriter;
 
 public class OSCManager extends Plugin {
+	
+	public static final String TAG = "OSCManager";
+	
 	public boolean hasAddress = false; // send only after selecting ip address / port to send to
 	public int receivePort; 
-	public final Object        sync = new Object();
+	public final Object sync = new Object();
 	
 	public OSCPortIn receiver = null;
 	public OSCPortOut sender;
@@ -41,6 +44,7 @@ public class OSCManager extends Plugin {
 	@Override
 	public PluginResult execute(String action, JSONArray data, String callbackId) {
 		PluginResult result = null;
+		Log.d(TAG, "execute action : " + action + ", data : " + data.toString() + (hasAddress ? " HAS ADDRESS " : " NO ADDRESS") );	
 		try {
 		    if (action.equals("startOSCListener") && receiver == null) {
      		    Log.d("OSCManager", "building client");	
@@ -48,33 +52,28 @@ public class OSCManager extends Plugin {
     			listener = new OSCListener() {
     	        	public void acceptMessage(java.util.Date time, OSCMessage message) {
     	        	    Object[] args = message.getArguments();
-            			//System.out.println("Message received!");
-            			if(message.getAddress().equals("/pushInterface")) {
-            			    //[jsStringStart replaceOccurrencesOfString:@"\n" withString:@"" options:1 range:NSMakeRange(0, [jsStringStart length])]; // will not work with newlines present
+            			System.out.println("Message received!");
+            			if (message.getAddress().equals("/pushInterface")) {
                             String js = "javascript:interfaceManager.pushInterface('" + ((String)args[0]).replace('\n', ' ') + "')"; // remove line breaks
-                    
                             webView.loadUrl(js);
-            			}else if(message.getAddress().equals("/pushDestination")) {
-            			    //		NSString *jsString = [[NSString alloc] initWithFormat:@"destinationManager.addDestination('%@')", destination];
+            			} else if(message.getAddress().equals("/pushDestination")) {
             			    String js = "javascript:destinationManager.pushDestination('" + (String)args[0] + "')";
             			    //System.out.println(js);
             			    webView.loadUrl(js);
-            			}else{
+            			} else{
             			    String jsString = "javascript:oscManager.processOSCMessage(";
                 			jsString = jsString + "\"" + message.getAddress() + "\", \"";
-    			
                 			StringBuffer typeTagString = new StringBuffer();
                 			StringBuffer argString = new StringBuffer();
-    			
                 			for(int i = 0; i < args.length; i++) {
                 			    Object arg = args[i];
-            			        if(arg instanceof java.lang.Float) {
+            			        if (arg instanceof java.lang.Float) {
             			            typeTagString.append('f');
             			            argString.append( ((Float)args[i]).floatValue() );
-            			        }else if(arg instanceof java.lang.Integer) {
+            			        } else if (arg instanceof java.lang.Integer) {
             			            typeTagString.append('i');
             			            argString.append( ((Integer)args[i]).intValue() );
-            			        }else if(arg instanceof java.lang.String) {
+            			        } else if (arg instanceof java.lang.String) {
             			            typeTagString.append('s');
             			            argString.append("\"");
             			            argString.append( ((String)args[i]) );
@@ -93,10 +92,9 @@ public class OSCManager extends Plugin {
             	Log.d("OSCManager", "finished setting up OSC receiver and now listening");
         		
     		} else if (action.equals("send") && hasAddress) {
-    			//Log.d("OSCManager", "building message");
+    			Log.d("OSCManager", "building message");
     			String address = "";
     			ArrayList<Object> values = new ArrayList<Object>();
-			
     			address = data.getString(0);
 				for(int i = 2; i < data.length(); i++) {
 				    Object obj = data.get(i);
@@ -108,32 +106,22 @@ public class OSCManager extends Plugin {
     				}
 					//Log.d("OSCManager", ""+data.get(i).getClass().toString());
 				}
-    		
+				
     			OSCMessage msg = new OSCMessage( address, values.toArray() );
-
-             	
-                sender.send(msg);
-    	         // }
-    	         //                 catch( IOException e ) {
-    	         //                    System.err.println("CRAP NetUtil osc sending isn't working!!!");
-    	         // 
-    	         //                    StringWriter sw = new StringWriter();
-    	         //                    e.printStackTrace(new PrintWriter(sw));
-    	         //                    System.err.println( sw.toString());
-    	         //                 }
-    		}else if(action.equals("setIPAddressAndPort")){
+    			sender.send(msg);
+    		} else if(action.equals("setIPAddressAndPort")){
 			    ipAddress = data.getString(0);
 				sender = new OSCPortOut( InetAddress.getByName(ipAddress), data.getInt(1) );
 				hasAddress = true;
-    		}else if(action.equals("setOSCReceivePort")){
+    		} else if(action.equals("setOSCReceivePort")){
 			   	receiver = new OSCPortIn(data.getInt(0));
 			   	receiver.addListener("/", listener);
 			   	System.err.println("MADE NEW PORT WHICH WAS " + data.getInt(0));
-    		}else{
+    		} else{
     			result = new PluginResult(Status.INVALID_ACTION);
     		}
     		return result;
-    	}catch (Exception e) {
+    	} catch (Exception e) {
             System.err.println("Error creating JSON from js message");
         }
         return result;
