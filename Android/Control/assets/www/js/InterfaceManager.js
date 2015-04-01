@@ -181,16 +181,20 @@ function InterfaceManager() {
 
     this.downloadInterface = function(ipAddress) {
         // EVENT --- CANNOT REFER TO THIS, MUST USE INTERFACE MANAGER
-        console.log("downloading...");
+        console.log("downloadInterface start");
         interfaceManager.myRequest = new XMLHttpRequest();
         var loadedInterfaceName = null;
         PhoneGap.exec(null, null, "DeviceFeatures", "print", ["starting download ....................................."]);  
         interfaceManager.myRequest.onreadystatechange = function() {
-        PhoneGap.exec(null, null, "DeviceFeatures", "print", ["downloading stage " + interfaceManager.myRequest.readyState]);
+        	console.log("download done, ready state : " + interfaceManager.myRequest.readyState.toString());
+        	PhoneGap.exec(null, null, "DeviceFeatures", "print", ["downloading stage " + interfaceManager.myRequest.readyState]);
             if (interfaceManager.myRequest.readyState == 4) {
+            	console.log("A");
                 console.log(interfaceManager.myRequest.responseText);
                 eval(interfaceManager.myRequest.responseText);
+                console.log("A1");
                 if (loadedInterfaceName != null) {
+                	console.log("B");
                     if (document.getElementById("promptDiv") != null) {
                         document.getElementById("Interfaces").removeChild(document.getElementById("promptDiv"));
                     }
@@ -198,16 +202,20 @@ function InterfaceManager() {
                     interfaceManager.interfaceIP = ipAddress;
                     interfaceManager.runInterface(interfaceManager.myRequest.responseText);
                 } else {
+                	console.log("C");
                     document.getElementById("inputFieldHeader").innerHTML = "Could not load. Please try another URL";
                     return;
                 }
+                console.log("D");
             }
+            console.log("E");
         }
         interfaceManager.myRequest.ipAddress = ipAddress;
         interfaceManager.ipAddress = ipAddress;
         //interfaceManager.myRequest.withCredentials = "true";
         interfaceManager.myRequest.open("GET", ipAddress, true);
         interfaceManager.myRequest.send(null);
+        console.log("downloadInterface end");
     }
 
 
